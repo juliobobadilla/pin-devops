@@ -1,0 +1,74 @@
+services:
+  db:
+    image: postgres:15
+    container_name: repa2024-db-1
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-example}
+      POSTGRES_DB: ${POSTGRES_DB:-iaavim}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - repa-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  adminer:
+    image: adminer
+    container_name: repa-adminer
+    restart: always
+    ports:
+      - "9090:8080"
+    networks:
+      - repa-network
+    depends_on:
+      - db
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: repa-backend
+    restart: always
+    ports:
+      - "8000:80"
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-example}@db:5432/${POSTGRES_DB:-iaavim}
+      - POSTGRES_DBHOST=repa2024-db-1
+      - SECRET_KEY=${SECRET_KEY}
+      - ALGORITHM=${ALGORITHM}
+    volumes:
+      - ./backend/src:/code/src
+    networks:
+      - repa-network
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: /home/alejandro/Repa2025-Frontend-NEW-main
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://192.100.186.143:8000
+    container_name: repa-frontend
+    restart: always
+    ports:
+      - "3000:80"
+    networks:
+      - repa-network
+    depends_on:
+      - backend
+
+networks:
+  repa-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
