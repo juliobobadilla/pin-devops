@@ -33,8 +33,11 @@ jobs:
         run: npm run lint
 
       - name: Run Snyk security scan
-        uses: snyk/actions/node@master
+        uses: snyk/actions/node@v2
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          args: test --severity-threshold=high
+          args: >
+            test
+            --severity-threshold=high
+            --fail-on=all
