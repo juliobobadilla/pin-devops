@@ -10,6 +10,7 @@ on:
 jobs:
   frontend-ci:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     defaults:
       run:
@@ -40,4 +41,4 @@ jobs:
           args: >
             test
             --severity-threshold=high
-            --fail-on=all
+           
