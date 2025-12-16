@@ -1,17 +1,12 @@
-FROM node:22-alpine as base
+FROM node:18-alpine
 
-WORKDIR /usr/src/app/
-COPY package*.json /
+WORKDIR /usr/src/app
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY . .
+
 EXPOSE 3000
 
-FROM base as production
-ENV NODE_ENV=production
-RUN npm ci
-COPY . .
-CMD ["node", "App,js"]
-
-FROM base as dev
-ENV NODE_ENV=development
-RUN npm install -g nodemon && npm install
-COPY . .
-CMD ["nodemon", "App.js"]
+CMD ["npm", "start"]
