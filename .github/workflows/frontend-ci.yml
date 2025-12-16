@@ -24,7 +24,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: "npm"
+          cache: npm
           cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies
@@ -33,12 +33,10 @@ jobs:
       - name: Run ESLint
         run: npm run lint
 
+      - name: Install Snyk CLI
+        run: npm install -g snyk
+
       - name: Run Snyk security scan
-        uses: snyk/actions/node@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: >
-            test
-            --severity-threshold=high
-           
+        run: snyk test --severity-threshold=high
