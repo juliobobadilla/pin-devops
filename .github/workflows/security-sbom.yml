@@ -33,14 +33,15 @@ jobs:
       - name: Install Snyk CLI
         run: npm install -g snyk
 
-      - name: Run Snyk dependency scan (report only)
+      - name: Authenticate Snyk
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        run: snyk auth $SNYK_TOKEN
+
+      - name: Run Snyk dependency scan (report only)
         run: snyk test --severity-threshold=high || true
 
       - name: Generate SBOM (CycloneDX)
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         run: snyk sbom --format=cyclonedx --json > sbom-cyclonedx.json
 
       - name: Upload SBOM artifact
