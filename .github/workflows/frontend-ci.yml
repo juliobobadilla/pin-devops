@@ -1,4 +1,4 @@
-name: Frontend CI - Lint & Security
+name: Frontend CI - Lint y Seguridad
 
 on:
   pull_request:
@@ -33,4 +33,12 @@ jobs:
       - name: Run ESLint
         run: npm run lint
 
+      # ---- Security (Snyk) ----
+      - name: Install Snyk CLI
+        run: npm install -g snyk
 
+      - name: Run Snyk security scan (report only)
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        run: |
+          snyk test --severity-threshold=high || true
