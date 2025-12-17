@@ -1,4 +1,5 @@
 name: Security Scan & SBOM (Frontend)
+# SBOM generation with Snyk - CycloneDX
 
 on:
   push:
